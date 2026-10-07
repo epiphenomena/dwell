@@ -1,0 +1,37 @@
+# Dwell on Cloudflare: the static app (dist/, built by tools/build-dist.mjs)
+# behind a Worker (worker/index.js) that serves Bible text and the API.
+name = "dwell"
+main = "worker/index.js"
+compatibility_date = "2026-09-01"
+
+# One origin: the app lives at dwell.literal.work only.
+workers_dev = false
+preview_urls = false
+routes = [{ pattern = "dwell.literal.work", custom_domain = true }]
+
+[assets]
+# Only what tools/build-dist.mjs copies in: never the repo root, which holds
+# licensed sources (versions/) and database backups (backups/).
+directory = "./dist"
+binding = "ASSETS"
+# Text and the API always go through the Worker, which decides who may read
+# what; dist/text/ holds only public versions anyway.
+run_worker_first = ["/api/*", "/text/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dwell"
+database_id = "00000000-0000-0000-0000-000000000000" # your own (npx wrangler d1 create / kv namespace create)
+migrations_dir = "worker/migrations"
+
+# Licensed Bible text (owner accounts only), one key per version: text:<id>
+[[kv_namespaces]]
+binding = "TEXT"
+id = "00000000000000000000000000000000" # your own (npx wrangler d1 create / kv namespace create)
+
+[vars]
+SMTP_HOST = "smtp.dreamhost.com"
+SMTP_PORT = "465"
+MAIL_FROM = "Dwell <dwell@literal.work>"
+# Secrets (wrangler secret put): SMTP_USER, SMTP_PASS, OWNER_EMAILS.
+# Local development reads them from .dev.vars instead.

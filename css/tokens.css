@@ -1,0 +1,117 @@
+/* Design tokens. Dark is the default; light and sepia override below.
+   Contrast is kept moderate: body text about 10-11:1 against the page (no
+   pure black or white), dimmed text over 5:1, faint text over 3:1. */
+:root {
+  color-scheme: dark;
+
+  --bg: #1a1b1e;
+  --bg-raised: #212226;
+  --surface: #27292d;
+  --surface-2: #2f3236;
+  --line: #373a3f;
+  --text: #d3cdc0;
+  --text-dim: #a29e94;
+  --text-faint: #77746d;
+  --accent: #d2b072;
+  --accent-ink: #1a1408;
+  --sel: rgb(210 176 114 / 0.20);
+  --flash: rgb(210 176 114 / 0.32);
+  --danger: #e0685e;
+  /* Marks that aren't scripture (chapter/verse numbers, reference and note
+     markers) stay quiet: muted versions of the text and accent colors. */
+  --mark: color-mix(in srgb, var(--accent) 50%, var(--bg));
+  --mark-strength: 55%; /* how much pin color shows in pin underlines */
+
+  /* Pin colors, after the map pins in Tears of the Kingdom, softened so
+     they don't pull the eye from the text */
+  --pin-0: #c46f66;
+  --pin-1: #c78f5c;
+  --pin-2: #c4b06e;
+  --pin-3: #87a877;
+  --pin-4: #66a8a0;
+  --pin-5: #7590c2;
+  --pin-6: #9b87c2;
+  --ribbon: #a8875a;
+  /* Stars: the blue pin's color, at full strength (pin underlines are
+     muted) so starred passages stand out while flipping */
+  --star: var(--pin-5);
+
+  /* Around the app on wide screens */
+  --bg-outer: #131416;
+  --app-max: 840px;
+
+  /* Heatmap ramp: never read → read just now */
+  --heat-0: #25272a;
+  --heat-1: #2c3a3a;
+  --heat-2: #2f5a52;
+  --heat-3: #3e8a6e;
+  --heat-4: #7cc68a;
+
+  /* The device's own faces first: ui-serif is New York on Apple devices,
+     serif is Noto Serif on Android; Charter and friends fill in on desktops
+     whose default serif is plain Times. */
+  --font-serif: ui-serif, Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-text: var(--font-serif);
+  --font-ui: var(--font-sans);
+
+  --text-size: 20px;
+  --text-leading: 1.6;
+
+  --top-h: 44px;
+  --dock-h: 80px;
+  --locator-h: 18px;
+  --gutter: 22px;
+
+  --radius: 10px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --dur: 240ms;
+
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #e8e6e0;
+  --bg-raised: #e0ded7;
+  --surface: #d8d5ce;
+  --surface-2: #cecbc3;
+  --line: #c9c5bc;
+  --text: #33302b;
+  --text-dim: #625e56;
+  --text-faint: #86817a;
+  --accent: #7d5a1c;
+  --accent-ink: #fff;
+  --sel: rgb(125 90 28 / 0.16);
+  --flash: rgb(125 90 28 / 0.26);
+  --pin-0: #c2766d; --pin-1: #c69466; --pin-2: #c2ad6c; --pin-3: #8aa97b;
+  --pin-4: #6ba7a0; --pin-5: #7f97c4; --pin-6: #a08dc4; --ribbon: #9b7a4c;
+  --bg-outer: #dcdad4;
+  --heat-0: #d8d5ce; --heat-1: #d6e2d4; --heat-2: #a9cfb1; --heat-3: #6bb18a; --heat-4: #2f8a5e;
+}
+
+:root[data-theme="sepia"] {
+  color-scheme: light;
+  --bg: #eee4cf;
+  --bg-raised: #e6dbc4;
+  --surface: #dfd2b8;
+  --surface-2: #d4c5a7;
+  --line: #cdbd9d;
+  --text: #3d3226;
+  --text-dim: #6b5b47;
+  --text-faint: #8a7a62;
+  --accent: #80531c;
+  --accent-ink: #fff;
+  --sel: rgb(128 83 28 / 0.16);
+  --flash: rgb(128 83 28 / 0.26);
+  --pin-0: #bf7368; --pin-1: #c19060; --pin-2: #b9a364; --pin-3: #86a273;
+  --pin-4: #67a098; --pin-5: #7a8fba; --pin-6: #9a86b9; --ribbon: #94703f;
+  --bg-outer: #e2d7c1;
+  --heat-0: #dfd2b8; --heat-1: #d4d4b4; --heat-2: #aec499; --heat-3: #77a676; --heat-4: #3f7f55;
+}
+
+/* Sans serif text (setting) */
+:root[data-font="sans"] { --font-text: var(--font-sans); }

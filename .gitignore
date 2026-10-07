@@ -1,0 +1,21 @@
+# Generated or local-only; never committed.
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.dev.vars.*
+.env*
+
+# Bible text: built locally (`npm run text` for the public BSB); sources stay local.
+# Non-public (licensed) versions must never be committed.
+data/text/
+versions/
+*.zip
+
+# Database dumps hold real user data.
+backups/
+*.sql
+!worker/migrations/*.sql
+
+.DS_Store
+

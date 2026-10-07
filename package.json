@@ -1,0 +1,14 @@
+{
+  "name": "dwell",
+  "private": true,
+  "type": "module",
+  "description": "Dwell: a Bible reader. The app is static; the backend is a Cloudflare Worker (worker/).",
+  "scripts": {
+    "build": "node tools/build-dist.mjs",
+    "dev": "node tools/build-dist.mjs && wrangler dev",
+    "deploy": "node tools/build-dist.mjs && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.147.0"
+  }
+}

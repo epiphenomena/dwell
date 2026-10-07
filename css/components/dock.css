@@ -1,0 +1,80 @@
+/* Dock: seven pin buttons and the reading ribbon, like the ribbons in a
+   printed Bible. Four across on phones, all eight in a row on wider screens. */
+.dock {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 6px 0 8px;
+}
+
+@media (min-width: 600px) {
+  .dock { grid-template-columns: repeat(8, 1fr); }
+}
+
+.pin {
+  position: relative;
+  min-width: 0;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 7px;
+  border: 1.5px solid color-mix(in srgb, var(--c) 55%, transparent);
+  background: transparent;
+  touch-action: manipulation;
+  transition: background-color 160ms, box-shadow 160ms, transform 120ms;
+}
+.pin:active { transform: scale(.96); }
+
+/* on: filled with the pin's color, labelled with its passage */
+.pin.is-on {
+  border-color: var(--c);
+  background: var(--c);
+  color: #15130f;
+}
+
+/* its passage is on this page */
+.pin.is-here { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--c); }
+
+.pin__label {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 27px;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The reading ribbon: neutral button, ribbon swatch, its page reference */
+.pin--ribbon {
+  border-color: var(--line);
+  color: var(--text-dim);
+}
+.pin--ribbon.is-on {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--text);
+}
+.pin--ribbon .pin__icon {
+  position: absolute;
+  top: -1.5px;
+  right: 7px;
+  width: 7px;
+  height: 12px;
+}
+
+/* Linking: only pins that are on can be picked */
+.dock[data-mode="link"] .pin:not(.is-on) { opacity: .3; }
+
+/* Ribbon swatch used for pins in lists and editors */
+.pin__icon {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 15px;
+  background: var(--c);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+}
+.pin__icon--big { width: 18px; height: 28px; }

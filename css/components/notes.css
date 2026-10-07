@@ -1,0 +1,51 @@
+/* Note editor: the text takes all the free space; tags and attached
+   passages follow; the attach choices sit at the bottom like the dock. */
+.sheet--note .sheet__body { display: flex; flex-direction: column; padding-bottom: 0; }
+.sheet--note .sheet__inner { flex: 1; display: flex; flex-direction: column; width: 100%; }
+
+.note__body {
+  flex: 1;
+  display: block;
+  width: 100%;
+  min-height: 12em;
+  margin-top: 8px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-text);
+  font-size: 18px;
+  line-height: 1.55;
+  resize: none;
+  outline: none;
+}
+.note__body::placeholder { color: var(--text-faint); }
+
+.note__tags { align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.note__tagin {
+  flex: 1;
+  min-width: 8em;
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  font-size: 14px;
+  outline: none;
+}
+.note__tagin::placeholder { color: var(--text-faint); }
+
+.note__links .passage:first-child { border-top: 1px solid var(--line); }
+
+.note__attach {
+  position: sticky;
+  bottom: 0;
+  margin: 0 calc(-16px - var(--safe-r)) 0 calc(-16px - var(--safe-l));
+  padding: 8px calc(16px + var(--safe-r)) calc(4px + var(--safe-b)) calc(16px + var(--safe-l));
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+}
+.note__attachlabel { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); }
+.dock--attach { padding-bottom: 4px; }
+.dock--attach .pin:disabled { cursor: default; }
+
+/* Tag suggestions under the tag input, and the notes list filter */
+.note__suggest { padding: 0 0 10px; }
+.notes__filter { margin: 4px 0 8px; }

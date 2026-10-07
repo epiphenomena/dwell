@@ -1,0 +1,65 @@
+/* Position hairlines: the current book (chapter segments), then OT and NT. */
+.bottom {
+  position: relative;
+  padding: 0 calc(var(--gutter) + var(--safe-r)) var(--safe-b) calc(var(--gutter) + var(--safe-l));
+  z-index: 2;
+}
+
+.locator {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  height: var(--locator-h);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.locator__track {
+  position: relative;
+  display: flex;
+  gap: 1px;
+  height: 2px;
+}
+
+.locator__track > i {
+  display: block;
+  min-width: 0;
+  height: 100%;
+  background: var(--line);
+  border-radius: 1px;
+}
+
+.locator__track > i.is-current { background: var(--text-faint); }
+
+.locator__mark {
+  position: absolute;
+  top: -1px;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--accent);
+  transition: left var(--dur) var(--ease);
+}
+
+.locator.is-scrubbing .locator__track { height: 4px; }
+
+.locator__bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 13px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms;
+}
+.locator.is-scrubbing .locator__bubble { opacity: 1; }
+
+.bottom > .locator { max-width: 720px; margin: 0 auto; width: 100%; }

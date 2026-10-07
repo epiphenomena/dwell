@@ -1,0 +1,52 @@
+/* Top bar: history arrows, current passage (opens the navigator), menus. */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--safe-t) calc(6px + var(--safe-r)) 0 calc(6px + var(--safe-l));
+  color: var(--text-dim);
+  z-index: 2;
+}
+
+.topbar__btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex: none;
+}
+.topbar__btn:disabled { opacity: .25; cursor: default; }
+.topbar__btn:not(:disabled):active { background: var(--surface); }
+
+.topbar__title {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  border-radius: 20px;
+  text-align: center;
+}
+.topbar__title:active { background: var(--surface); }
+
+.topbar__ref {
+  display: block;
+  overflow: hidden;
+  font-size: 14px;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-dim);
+}
+
+.topbar { position: relative; }
+
+/* sync problem: a small dot on the menu button */
+.topbar__btn { position: relative; }
+.topbar__btn.has-alert::after {
+  content: "";
+  position: absolute;
+  top: 9px; right: 9px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--danger);
+}

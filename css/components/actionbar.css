@@ -1,0 +1,61 @@
+/* Selection actions: overlays the top bar while verses are selected. */
+.actionbar {
+  position: absolute;
+  inset: var(--safe-t) calc(6px + var(--safe-r)) 0 calc(6px + var(--safe-l));
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg);
+  color: var(--text);
+  z-index: 3;
+  animation: actionbar-in 160ms var(--ease);
+}
+
+@keyframes actionbar-in { from { opacity: 0; transform: translateY(-4px); } }
+
+.actionbar__btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  color: var(--text-dim);
+}
+.actionbar__btn:active { background: var(--surface); }
+.actionbar__btn.is-active { background: var(--accent); color: var(--accent-ink); }
+
+/* The asterisk is always in the star color; filled in when the selection is starred */
+.actionbar__star { color: var(--star); }
+.actionbar__star.is-on { background: var(--star); color: var(--bg); }
+
+.actionbar__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.actionbar__ref {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.actionbar__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 11px;
+}

@@ -1,0 +1,58 @@
+/* Heatmap: one cell per chapter, grouped by book, colored by recency. */
+.history .chips { margin: 14px 0 4px; }
+
+.heat__stats { margin: 12px 0 6px; font-size: 14px; color: var(--text-dim); }
+.heat__stats strong { color: var(--text); font-weight: 600; }
+
+.heat__legend {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.heat__legend .heat__cell:first-of-type { margin-left: 6px; }
+.heat__legend .heat__cell:nth-of-type(4) { margin-right: 6px; }
+
+.heat { display: flex; flex-direction: column; gap: 5px; }
+
+.heat__book { display: flex; gap: 8px; align-items: flex-start; }
+
+.heat__label {
+  flex: none;
+  width: 44px;
+  padding-top: 0;
+  font-size: 11px;
+  line-height: 12px;
+  color: var(--text-faint);
+  text-align: right;
+}
+
+.heat__cells { display: flex; flex-wrap: wrap; gap: 2px; }
+
+.heat__cell {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--heat-0);
+}
+.heat__cell[data-heat="1"] { background: var(--heat-1); }
+.heat__cell[data-heat="2"] { background: var(--heat-2); }
+.heat__cell[data-heat="3"] { background: var(--heat-3); }
+.heat__cell[data-heat="4"] { background: var(--heat-4); }
+button.heat__cell:active { outline: 2px solid var(--accent); }
+
+/* Ribbon / elsewhere switch, the ribbon streak, and the reset at the foot */
+.history__kinds { margin-bottom: 10px; }
+.history__kinds .pin__icon { margin-right: 6px; vertical-align: -2px; }
+
+.streak { display: flex; align-items: center; gap: 16px; margin: 4px 0 14px; padding: 12px 14px; border-radius: var(--radius); background: var(--bg-raised); }
+.streak__now { display: flex; align-items: baseline; gap: 6px; }
+.streak__now strong { font-size: 32px; font-weight: 600; line-height: 1; color: var(--ribbon); font-variant-numeric: tabular-nums; }
+.streak__now span { font-size: 14px; color: var(--text-dim); }
+.streak__meta { font-size: 13px; line-height: 1.45; color: var(--text-faint); }
+
+.history__reset { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+.history__reset .menu__note { margin: 8px 0 0; }

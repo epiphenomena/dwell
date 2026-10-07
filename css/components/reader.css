@@ -1,0 +1,187 @@
+/* Reader: text laid out in CSS columns, one column per screen, flipped
+   horizontally with a transform. */
+.reader {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Every gesture here is the reader's own: page swipes, and swipe up/down */
+  touch-action: none;
+}
+
+.reader__viewport {
+  position: absolute;
+  inset: 0 auto 0 50%;
+  overflow: hidden;
+  transform: translateX(-50%);
+}
+
+.reader__flow {
+  position: absolute;
+  top: 6px;
+  left: var(--gutter);
+  column-fill: auto;
+  font-family: var(--font-text);
+  font-size: var(--text-size);
+  line-height: var(--text-leading);
+  text-align: justify;
+  hyphens: manual;
+  -webkit-hyphens: manual;
+  /* Fill every line of the page: no lines held back for widow/orphan rules */
+  widows: 1;
+  orphans: 1;
+  overflow-wrap: break-word;
+  font-variant-numeric: oldstyle-nums;
+  will-change: transform;
+  /* One line of text; gaps and headings use whole lines to keep the page grid */
+  --line: calc(var(--text-size) * var(--text-leading));
+}
+
+.reader__flow.is-fading { animation: reader-fade 260ms var(--ease); }
+
+@keyframes reader-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.reader__book {
+  margin: 1.2em 0 1.4em;
+  font-weight: 400;
+  font-size: 1.5em;
+  letter-spacing: .02em;
+  text-align: center;
+  color: var(--text);
+  break-after: avoid;
+}
+
+.reader__book small {
+  display: block;
+  margin-bottom: .4em;
+  font-family: var(--font-ui);
+  font-size: .42em;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.chapter { margin: 0 0 .9em; }
+
+.reader__flow.is-chapter-break .chapter + .chapter,
+.reader__flow.is-chapter-break .ch-start { break-before: column; }
+.reader__flow.is-chapter-break .ch-start { margin-top: 0; }
+
+/* Paragraphs and poetry from the version's layout */
+.blk--p { text-indent: 1.4em; }
+.blk--first, .blk--m { text-indent: 0; }
+.blk--q1, .blk--q2, .blk--li1, .blk--li2 { text-align: left; }
+/* Poetry: wrapped lines hang deeper than the line's start */
+.blk--q1 { padding-left: 2.2em; text-indent: -1.8em; }
+.blk--q2 { padding-left: 2.2em; text-indent: -.6em; }
+.blk--li1 { padding-left: 2.2em; text-indent: -1.4em; }
+.blk--li2 { padding-left: 3.2em; text-indent: -1.4em; }
+.blk--pc { text-align: center; text-indent: 0; }
+.blk--qr { text-align: right; text-indent: 0; }
+.blk--gap { margin-top: var(--line); }
+
+/* Headings. Psalm titles (d) are part of the text; section headings and the
+   like are editorial, so they stay quiet. Each is set on whole lines. */
+.hd {
+  line-height: var(--line);
+  margin-top: var(--line);
+  break-after: avoid;
+}
+.hd + .hd { margin-top: 0; }
+.hd--d { font-style: italic; color: var(--text-dim); text-align: left; }
+.hd--s, .hd--ms, .hd--qa {
+  font-family: var(--font-ui);
+  font-size: .72em;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.hd--ms { text-align: center; }
+.hd--qa { letter-spacing: .14em; }
+.reader__book + .hd, .reader__book + .blk { margin-top: 0; }
+
+.chapter__num {
+  margin-right: .25em;
+  font-size: 1.5em;
+  font-weight: 300;
+  /* Taller than the text: keep it from growing its line off the page grid */
+  line-height: 0;
+  color: var(--text-faint);
+  font-variant-numeric: lining-nums;
+}
+
+.v {
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background-repeat: no-repeat;
+  transition: background-color 160ms;
+}
+
+.v__n {
+  margin-right: .18em;
+  font-family: var(--font-ui);
+  font-size: .55em;
+  font-weight: 600;
+  vertical-align: .55em;
+  line-height: 0;
+  color: var(--text-faint);
+  font-variant-numeric: lining-nums;
+}
+
+.chapter__num + .v .v__n { display: none; }
+
+.v--omitted { color: var(--text-faint); }
+
+.reader__flow.is-lines .v { display: block; margin-bottom: .25em; }
+.reader__flow.is-lines .chapter__num + .v .v__n { display: inline; }
+.reader__flow.is-lines .chapter__num { display: block; margin: .6em 0 .3em; }
+.reader__flow.is-lines .hd { display: block; margin: 0; }
+.reader__flow.no-numbers .v__n { display: none; }
+
+/* Markers. None of these may change layout: pages are measured before
+   decoration, so only color and absolutely positioned pseudo-elements are
+   used. They sit at the verse number: the number turns accent-colored and
+   small marks ride above it — a bar for references, a dot for notes. A
+   chapter's first verse has no number, so its marks sit above its first word. */
+/* Only marked verses are positioned: each positioned element is its own paint
+   layer, and thousands of them made every page turn stall while the browser
+   re-layered them all as the slide began. */
+.v:not(.v--cont).has-xref, .v:not(.v--cont).has-note { position: relative; }
+.v.has-xref .v__n, .v.has-note .v__n { position: relative; color: var(--accent); }
+
+.v:not(.v--cont).has-xref::before, .v:not(.v--cont).has-note::after {
+  content: "";
+  position: absolute;
+  top: -.12em;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  pointer-events: none;
+}
+.v.has-xref::before { left: 0; width: .6em; }
+.v.has-note::after { left: 0; width: 3px; }
+.v.has-xref.has-note::after { left: .75em; }
+
+/* Generous invisible hit area on marked numbers */
+.v.has-xref .v__n::before, .v.has-note .v__n::before {
+  content: "";
+  position: absolute;
+  inset: -1.1em -.7em;
+}
+
+/* With verse numbers hidden, mark the text itself */
+.reader__flow.no-numbers .v.has-xref { text-decoration: underline dotted 1px var(--mark); text-underline-offset: .25em; }
+
+.v.is-sel { background-color: var(--sel); }
+.v.is-flash { background-color: var(--flash); }
+
+.reader__empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text-faint);
+}

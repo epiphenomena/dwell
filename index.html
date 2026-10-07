@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-theme="dark" translate="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#1a1b1e">
+  <meta name="color-scheme" content="dark light">
+  <meta name="google" content="notranslate">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Dwell</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components/topbar.css">
+  <link rel="stylesheet" href="css/components/reader.css">
+  <link rel="stylesheet" href="css/components/locator.css">
+  <link rel="stylesheet" href="css/components/dock.css">
+  <link rel="stylesheet" href="css/components/actionbar.css">
+  <link rel="stylesheet" href="css/components/sheet.css">
+  <link rel="stylesheet" href="css/components/list.css">
+  <link rel="stylesheet" href="css/components/navigator.css">
+  <link rel="stylesheet" href="css/components/heatmap.css">
+  <link rel="stylesheet" href="css/components/notes.css">
+  <link rel="stylesheet" href="css/components/search.css">
+  <link rel="stylesheet" href="css/components/toast.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="actionbar" id="actionbar" hidden></div>
+    <button class="topbar__btn" id="btn-back" aria-label="Back (hold for history)" disabled>
+      <svg class="icon" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <button class="topbar__btn" id="btn-fwd" aria-label="Forward" disabled>
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <button class="topbar__title" id="btn-nav" aria-label="Go to book and chapter">
+      <span class="topbar__ref" id="page-ref">&nbsp;</span>
+    </button>
+    <button class="topbar__btn" id="btn-search" aria-label="Search">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+    </button>
+    <button class="topbar__btn" id="btn-menu" aria-label="Menu: history, notes, tags, settings">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+    </button>
+  </header>
+
+  <main class="reader" id="reader">
+    <div class="reader__viewport">
+      <article class="reader__flow" id="flow"></article>
+    </div>
+  </main>
+
+  <footer class="bottom">
+    <div class="locator" id="locator" role="button" tabindex="0" aria-label="Position in the Bible"></div>
+    <nav class="dock" id="dock" aria-label="Pins"></nav>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+/* Reset and app frame: a fixed, full-screen three-row layout. */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+.topbar, .bottom, .reader { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+html { background: var(--bg-outer); }
+
+/* On wide screens the app is a tablet-width column on a plain background. */
+body {
+  display: grid;
+  grid-template-rows: calc(var(--top-h) + var(--safe-t)) 1fr auto;
+  height: 100dvh;
+  max-width: var(--app-max);
+  margin: 0 auto;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+input, textarea, select { font: inherit; color: inherit; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+[hidden] { display: none !important; }
+
+.icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}
