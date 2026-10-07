@@ -162,6 +162,8 @@
 .menu__credits { margin: 16px 0 8px; font-size: 13px; color: var(--text-faint); }
 .menu__credits a { color: inherit; text-decoration-color: var(--text-faint); text-underline-offset: 3px; }
 .menu__credits a:hover { color: var(--text-dim); }
+.menu__share { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-color: var(--text-faint); text-underline-offset: 3px; }
+.menu__share:hover { color: var(--text-dim); }
 
 /* Sync status */
 .sync { display: flex; flex-direction: column; gap: 8px; }

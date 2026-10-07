@@ -6,7 +6,7 @@
 // the app on sign-out. The list comes from js/versions.js (a change there
 // also updates this worker). API calls are never cached.
 importScripts('js/versions.js');
-const VERSION = 'dwell-v20';
+const VERSION = 'dwell-v21';
 
 const SHELL = [
   './', 'manifest.webmanifest',

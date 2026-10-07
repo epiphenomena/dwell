@@ -117,11 +117,27 @@ export function openMenu({ go, toggleFullscreen }) {
   return sheet;
 }
 
+// Share: copy the app's address to the clipboard.
+const SITE = 'https://dwell.literal.work/';
+function share() {
+  const b = h('button', { type: 'button', class: 'menu__share' }, 'Share');
+  b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(SITE); }
+    catch {
+      const t = Object.assign(document.createElement('textarea'), { value: SITE });
+      document.body.append(t); t.select(); document.execCommand('copy'); t.remove();
+    }
+    b.textContent = 'Link copied';
+    setTimeout(() => { b.textContent = 'Share'; }, 2000);
+  });
+  return b;
+}
+
 // Where Dwell comes from: its maker and its source.
 function credits() {
   const link = (href, label) => h('a', { href, target: '_blank', rel: 'noopener' }, label);
   return h('p', { class: 'menu__credits' },
-    'Dwell · ', link('https://github.com/epiphenomena/dwell', 'Source'),
+    'Dwell · ', share(), ' · ', link('https://github.com/epiphenomena/dwell', 'Source'),
     ' · ', link('https://epiphenomena.github.io/', 'epiphenomena'));
 }
 
