@@ -16,13 +16,14 @@
 .actionbar__btn {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   flex: none;
   border-radius: 50%;
   color: var(--text-dim);
 }
 .actionbar__btn:active { background: var(--surface); }
+a.actionbar__btn { text-decoration: none; }
 .actionbar__btn.is-active { background: var(--accent); color: var(--accent-ink); }
 
 /* The asterisk is always in the star color; filled in when the selection is starred */

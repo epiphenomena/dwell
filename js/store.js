@@ -9,9 +9,11 @@
 import * as db from './db.js';
 import { TOTAL, overlaps } from './canon.js';
 
-// Seven passage pins; the eighth dock slot is the reading ribbon.
-export const PIN_COUNT = 7;
-export const PIN_NAMES = ['Red', 'Orange', 'Yellow', 'Green', 'Teal', 'Blue', 'Purple'];
+// Three passage pins; the fourth dock slot is the reading ribbon. (There
+// were seven once; their colors stay in tokens.css for old note links,
+// with green and yellow swapped so the third pin is green.)
+export const PIN_COUNT = 3;
+export const PIN_NAMES = ['Red', 'Orange', 'Green'];
 
 // Minimum time a page must stay on screen to count as read, and the cap on
 // one entry's duration so an idle screen doesn't count as hours of reading.

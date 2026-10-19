@@ -111,7 +111,7 @@ btnFwd.addEventListener('click', () => forward());
 longPress(btnBack, () => openHistory({ go, tab: 'timeline' }));
 $('#btn-nav').addEventListener('click', () => openNavigator({ reader, go }));
 $('#btn-search').addEventListener('click', () => openSearch({ reader, go }));
-$('#btn-menu').addEventListener('click', () => openMenu({ go, toggleFullscreen }));
+$('#btn-menu').addEventListener('click', () => openMenu({ go, setFullscreen }));
 
 reader.addEventListener('marker', e => openInfo({ s: e.detail, e: e.detail }, { go }));
 
@@ -139,8 +139,7 @@ const dock = initDock($('#dock'), {
   onTap(i) {
     const pin = store.pins[i];
     const sel = reader.selection;
-    if (sel && actionbar.mode === 'link') {
-      if (pin.s == null) return;
+    if (sel && actionbar.mode === 'link' && pin.s != null) {
       store.addLink(sel, pin);
       toast(`Linked ${fmtRange(sel.s, sel.e, true)} ↔ ${fmtRange(pin.s, pin.e, true)}`);
       reader.clearSelection();
@@ -224,18 +223,24 @@ initLocator($('#locator'), {
 });
 
 // ---- fullscreen ----
-function toggleFullscreen() {
-  if (!document.fullscreenEnabled) return toast('Fullscreen isn’t available here — add Dwell to your home screen');
-  if (document.fullscreenElement) document.exitFullscreen();
-  else document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+// One setting (autoFullscreen): on, a phone goes fullscreen at the first tap
+// on the text, and again after the system takes it out (switching apps);
+// off, it never does. The installed app opens with its normal window
+// (manifest: standalone), so the setting decides there too.
+const enterFullscreen = () => document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+function setFullscreen(on) {
+  if (!document.fullscreenEnabled) { if (on) toast('Fullscreen isn’t available in this browser'); return; }
+  if (on && !document.fullscreenElement) enterFullscreen();
+  else if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
 }
-const standalone = matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches;
+function toggleFullscreen() {
+  store.setting('autoFullscreen', !store.settings.autoFullscreen);
+  setFullscreen(store.settings.autoFullscreen);
+}
 const coarse = matchMedia('(pointer: coarse)').matches;
 $('#reader').addEventListener('pointerup', () => {
-  if (store.settings.autoFullscreen && coarse && !standalone && !document.fullscreenElement && document.fullscreenEnabled) {
-    document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-  }
-}, { once: true });
+  if (store.settings.autoFullscreen && coarse && !document.fullscreenElement && document.fullscreenEnabled) enterFullscreen();
+});
 
 // ---- keyboard ----
 addEventListener('keydown', e => {

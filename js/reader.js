@@ -8,6 +8,14 @@
 import { BOOKS, bookStart, locate } from './canon.js';
 import { loadBook, loadLayout } from './text.js';
 
+// Page heights seen per screen width (see Reader#size), kept across visits so
+// the first time out of fullscreen doesn't reflow either.
+// The key changes when the space around the page does (the dock went to one
+// row), since a remembered height only ever shrinks.
+const PAGE_H_KEY = 'dwell-page-h2';
+const pageHeights = (() => { try { return JSON.parse(localStorage.getItem(PAGE_H_KEY)) || {}; } catch { return {}; } })();
+const savePageHeights = () => { try { localStorage.setItem(PAGE_H_KEY, JSON.stringify(pageHeights)); } catch { /* private mode */ } };
+
 const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
 export class Reader extends EventTarget {
@@ -35,7 +43,12 @@ export class Reader extends EventTarget {
     let t;
     new ResizeObserver(() => {
       clearTimeout(t);
-      t = setTimeout(() => this.relayout(), 120);
+      // Only when the page itself changes size: the system bars coming and
+      // going leave it as it is (see #size).
+      t = setTimeout(() => {
+        const size = this.#size();
+        if (size.key !== this.#sized) this.relayout(); else this.#place(size);
+      }, 120);
     }).observe(root);
   }
 
@@ -177,18 +190,44 @@ export class Reader extends EventTarget {
     this.#paintSelection();
   }
 
-  #paginate() {
-    const h = this.root.clientHeight;
+  // The page's size. Its height is the space there is with the system bars
+  // showing, even while they're hidden (fullscreen, or a swipe from the edge
+  // brings them back): the spare space is split above and below the page,
+  // and the text never reflows as the bars come and go. Per screen width and
+  // orientation the smallest height seen near the tallest is remembered;
+  // anything much shorter (an on-screen keyboard) is used as it is.
+  #size() {
+    const W = this.root.clientWidth, H = this.root.clientHeight;
+    const k = `${W}${screen.width > screen.height ? 'l' : 'p'}`;
+    const seen = pageHeights[k] ?? (pageHeights[k] = { max: H, min: H });
+    if (H > seen.max) { seen.max = H; if (seen.min < H * 0.75) seen.min = H; }
+    if (H >= seen.max * 0.75 && H < seen.min) seen.min = H;
+    savePageHeights();
+    const h = H >= seen.max * 0.75 ? seen.min : H;
+
     const gutter = parseFloat(getComputedStyle(this.root).getPropertyValue('--gutter')) || 22;
+    const fs = parseFloat(getComputedStyle(this.flow).fontSize);
     // Keep lines a readable length on wide screens: the page is centered.
-    const maxLine = parseFloat(getComputedStyle(this.flow).fontSize) * 34;
-    const w = Math.floor(Math.min(this.root.clientWidth, maxLine + 2 * gutter));
-    const colW = w - 2 * gutter;
+    const w = Math.floor(Math.min(W, fs * 34 + 2 * gutter));
     const top = 4, bottom = 0;
     // Snap the column height to whole lines so no line is clipped at the foot.
-    const fs = parseFloat(getComputedStyle(this.flow).fontSize);
     const lh = fs * (parseFloat(getComputedStyle(this.flow).lineHeight) / fs || 1.6);
     const colH = Math.max(lh, Math.floor((h - top - bottom) / lh) * lh);
+    return { w, colH, gutter, pad: Math.max(0, Math.floor((H - colH) / 2) - 6), key: `${w}x${colH}x${fs}` };
+  }
+
+  // Centered in the space there is (part of a line, plus whatever the hidden
+  // bars left), so the margins above and below match.
+  #place({ pad }) { this.flow.style.top = pad ? `${6 + pad}px` : ''; }
+
+  #sized = '';
+
+  #paginate() {
+    const size = this.#size();
+    const { w, colH, gutter } = size;
+    this.#sized = size.key;
+    this.#place(size);
+    const colW = w - 2 * gutter;
 
     this.viewport.style.width = `${w}px`;
     Object.assign(this.flow.style, {

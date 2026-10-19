@@ -152,7 +152,7 @@ export function openNote(note, { go, isNew = false, resume = false }) {
       onRemove: () => { note.links.splice(k, 1); store.updateNote(note); render(); },
     })));
 
-    // Same layout as the dock: the seven pins, and This page where the ribbon sits.
+    // Same layout as the dock: the three pins, and This page where the ribbon sits.
     fill(attach,
       h('div', { class: 'note__attachlabel' }, note.links.length ? 'Attach another passage' : 'Attach a passage'),
       h('div', { class: 'dock dock--attach' },

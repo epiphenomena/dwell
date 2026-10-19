@@ -1,5 +1,5 @@
-/* Dock: seven pin buttons and the reading ribbon, like the ribbons in a
-   printed Bible. Four across on phones, all eight in a row on wider screens. */
+/* Dock: three pin buttons and the reading ribbon, like the ribbons in a
+   printed Bible, in one row. */
 .dock {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -9,15 +9,11 @@
   padding: 6px 0 8px;
 }
 
-@media (min-width: 600px) {
-  .dock { grid-template-columns: repeat(8, 1fr); }
-}
-
 .pin {
   position: relative;
   min-width: 0;
   height: 30px;
-  padding: 0 6px;
+  padding: 0 4px;
   border-radius: 7px;
   border: 1.5px solid color-mix(in srgb, var(--c) 55%, transparent);
   background: transparent;
@@ -39,7 +35,7 @@
 .pin__label {
   display: block;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 27px;
   letter-spacing: .01em;
@@ -65,8 +61,8 @@
   height: 12px;
 }
 
-/* Linking: only pins that are on can be picked */
-.dock[data-mode="link"] .pin:not(.is-on) { opacity: .3; }
+/* Linking: off pins still place, but read as quieter than link targets */
+.dock[data-mode="link"] .pin:not(.is-on) { opacity: .5; }
 
 /* Ribbon swatch used for pins in lists and editors */
 .pin__icon {

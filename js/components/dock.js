@@ -1,4 +1,4 @@
-// The dock: seven colored pin buttons plus the reading ribbon, always
+// The dock: three colored pin buttons plus the reading ribbon, always
 // visible at the foot of the screen. A pin is on (filled, labelled with its
 // passage) or off (outline only, pointing nowhere); holding it clears it.
 // The ribbon marks the page you're reading through. Anything whose place is

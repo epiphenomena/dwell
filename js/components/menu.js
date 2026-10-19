@@ -10,7 +10,7 @@ import { openTags, openCrossRefs, openStars } from './tags.js';
 import { openHistory } from './history-view.js';
 import sync, { status, syncNow, exportServer } from '../sync.js';
 
-export function openMenu({ go, toggleFullscreen }) {
+export function openMenu({ go, setFullscreen }) {
   const body = h('div', { class: 'menu' });
   const syncBox = h('div', { class: 'sync' });
   const onStatus = () => renderSync(syncBox);
@@ -96,9 +96,8 @@ export function openMenu({ go, toggleFullscreen }) {
       toggle('headings', 'Section headings'),
       toggle('chapterBreak', 'Start chapters on a new page'),
       document.fullscreenEnabled ? h('label', { class: 'switch' },
-        h('input', { type: 'checkbox', checked: !!document.fullscreenElement, onchange: () => { toggleFullscreen(); changed(); } }),
+        h('input', { type: 'checkbox', checked: !!s.autoFullscreen, onchange: e => { store.setting('autoFullscreen', e.target.checked); setFullscreen(e.target.checked); changed(); } }),
         h('span', { class: 'switch__track' }), h('span', {}, 'Fullscreen')) : null,
-      toggle('autoFullscreen', 'Go fullscreen on first tap'),
       'wakeLock' in navigator ? toggle('keepAwake', 'Keep the screen on') : null,
     ),
     howTo(),
