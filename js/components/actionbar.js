@@ -10,16 +10,20 @@ import { version } from '../text.js';
 
 // Blue Letter Bible's book codes, in canon order. Its site has no BSB, so
 // the link uses the version being read when BLB has it, otherwise the KJV.
+// A version's own `blb` field (js/versions.js, or the gitignored
+// js/versions.local.js for licensed ones) names its code there; the set
+// below covers ids that are already BLB codes.
 // On Android the BLB app claims these links; on iOS they open in Safari.
 const BLB_BOOKS = `gen exo lev num deu jos jdg rth 1sa 2sa 1ki 2ki 1ch 2ch ezr neh est job
   psa pro ecc sng isa jer lam eze dan hos joe amo oba jon mic nah hab zep hag zec mal
   mat mar luk jhn act rom 1co 2co gal eph phl col 1th 2th 1ti 2ti tit phm heb jas 1pe 2pe
   1jo 2jo 3jo jde rev`.split(/\s+/);
-const BLB_VERSIONS = new Set(['kjv', 'nkjv', 'csb', 'net', 'esv', 'niv', 'nasb20', 'nlt']);
+const BLB_VERSIONS = new Set(['kjv', 'esv', 'niv', 'nasb20', 'nlt']);
 
 function blbUrl(s, e) {
   const A = locate(s), B = locate(e);
-  const v = BLB_VERSIONS.has(version().id) ? version().id : 'kjv';
+  const ver = version();
+  const v = ver.blb || (BLB_VERSIONS.has(ver.id) ? ver.id : 'kjv');
   // A range within one chapter shows as 16-18; otherwise the first verse.
   const verses = A.b === B.b && A.c === B.c && B.v > A.v ? `${A.v + 1}-${B.v + 1}` : A.v + 1;
   return `https://www.blueletterbible.org/${v}/${BLB_BOOKS[A.b]}/${A.c + 1}/${verses}/`;

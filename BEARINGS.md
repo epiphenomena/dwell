@@ -52,7 +52,7 @@ Claude keeps this file current during every session here, without being asked:
 - 2026-10-19 Pins cut from seven to three; pins 4-7 retired.
 - 2026-10-31 A page belongs to the chapter it ends in, for the chapter and book hairlines.
 - 2026-11-01 This git repo is the working repo from now on. It carries the Rakefile, the live D1/KV ids and the public version list. The Bible texts, sources, backups and `.dev.vars` stay gitignored. The one-off legacy-import tasks and the public-export script were not brought over.
-- 2026-11-01 The live D1/KV ids stay in the public repo; the licensed versions' names do not. They are defined in gitignored `versions/private.mjs`; `rake text` writes them to gitignored `js/versions.local.js`, and `rake build` merges it into `dist/js/versions.js`, which the app and the Worker load. Commits already on origin/main still name them (`tools/build-versions.mjs`); that history is not rewritten.
+- 2026-11-01 The live D1/KV ids stay in the public repo; the licensed versions' names do not. They are defined in gitignored `versions/private.mjs`; `rake text` writes them to gitignored `js/versions.local.js`, and `rake build` merges it into `dist/js/versions.js`, which the app and the Worker load. Commits already on origin/main still name them (`tools/build-versions.mjs`, the Blue Letter Bible list in `js/components/actionbar.js`). By choice the names stay in pushed history -- no rewrite, no force-push -- and only the current tree is kept clean. A licensed version's Blue Letter Bible code is its `blb` field in `versions/private.mjs`.
 
 ## Notes for later
 ### at every app change
@@ -69,7 +69,7 @@ Claude keeps this file current during every session here, without being asked:
 ## Inbox
 
 ## Done
-- 2026-11-01 Licensed versions' names moved out of the tracked files; merge-py rewritten so none of its commits name them.
+- 2026-11-01 Licensed versions' names moved out of the tracked files, the Blue Letter Bible list included; merge-py's own commits add none of them.
 - 2026-11-01 Merged the fossil checkout's 2026-10-31 locator work into branch merge-py.
 - 2026-10-19 Pin and selection changes, deployed and pushed.
 - 2026-10-04 Moved to Cloudflare at dwell.literal.work.
