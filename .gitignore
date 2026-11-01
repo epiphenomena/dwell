@@ -10,6 +10,7 @@ dist/
 # Non-public (licensed) versions must never be committed.
 data/text/
 versions/
+js/versions.local.js
 *.zip
 
 # Database dumps hold real user data.

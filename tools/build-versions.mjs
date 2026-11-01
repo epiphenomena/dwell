@@ -19,7 +19,8 @@
 // a built version: breaks at verse starts carry over as is, breaks inside a
 // verse land on the nearest matching word boundary.
 //
-// usage: node tools/build-versions.mjs bsb=<engbsb_usfm.zip> net=<NET.epub> csb=<dir> nkjv=<dir>
+// usage: node tools/build-versions.mjs bsb=<engbsb_usfm.zip> [<id>=<source> ...] [--private]
+//   --private builds every version in versions/private.mjs from its own `src`.
 //   BSB USFM: https://ebible.org/Scriptures/engbsb_usfm.zip (public domain)
 //   Build a layout donor (bsb) before the versions that borrow from it.
 import fs from 'node:fs';
@@ -36,33 +37,17 @@ const CODES = ['GEN', 'EXO', 'LEV', 'NUM', 'DEU', 'JOS', 'JDG', 'RUT', '1SA', '2
   '2JN', '3JN', 'JUD', 'REV'];
 
 // Order here is the order in the version picker. Only a public version may
-// be served to everyone; the others go only to the owner's account.
+// be served to everyone; the others go only to the owner's account. The
+// licensed (non-public) versions are defined in versions/private.mjs, which is
+// gitignored so their names stay out of the public repo; they follow these.
 const VERSIONS = {
   bsb: { abbr: 'BSB', name: 'Berean Standard Bible', note: 'Public domain', public: true, parse: parseUsfm },
-  net: {
-    abbr: 'NET', name: 'New English Translation', note: '© 1996–2016 Biblical Studies Press', parse: parseNetEpub,
-    // NET numbers 2 Cor 13 as the Greek does (13 verses); split back to 14.
-    fix: books => splitVerse(books, '2CO', 13, 12, 'All the saints greet you.'),
-  },
-  csb: {
-    abbr: 'CSB', name: 'Christian Standard Bible', note: '© 2017 Holman Bible Publishers',
-    parse: src => parseVerseFiles(src, { smartQuotes: true }),
-    // Like NET, 2 Cor 13 has 13 verses; Acts 24:6b–8a (a footnote in print) is run into 24:6.
-    fix: books => {
-      splitVerse(books, '2CO', 13, 12, 'All the saints send you greetings.');
-      moveText(books, 'ACT', 24, 6, 8, 'By examining him yourself');
-      // The source keeps the closing brackets of Mark 16:9–20 and John 7:53–8:11 but not the opening ones.
-      for (const ch of books.flat()) ch.verses = ch.verses.map(t => t.includes('[') ? t : t.replace(/\]$/, ''));
-    },
-    layoutFrom: 'bsb', titles: false, // the source has no psalm titles
-  },
-  nkjv: {
-    abbr: 'NKJV', name: 'New King James Version', note: '© 1982 Thomas Nelson',
-    parse: src => parseVerseFiles(src),
-    layoutFrom: 'bsb', titles: true, // psalm titles open verse 1; split them out
-    capitalLines: true, // poetry lines start with a capital, a strong hint for line breaks
-  },
 };
+const PRIVATE = path.resolve('versions', 'private.mjs');
+if (fs.existsSync(PRIVATE)) {
+  const define = (await import(PRIVATE)).default;
+  Object.assign(VERSIONS, define({ parseEpub, parseVerseFiles, splitVerse, moveText }));
+}
 
 // Verses absent from the critical text; every version leaves these empty.
 const OMITTED = ['MAT 17:21', 'MAT 18:11', 'MAT 23:14', 'MRK 7:16', 'MRK 9:44', 'MRK 9:46', 'MRK 11:26', 'MRK 15:28',
@@ -106,7 +91,7 @@ function builder(b) {
       if (chapters[c].verses[v]) throw new Error(`${where()}: verse appears twice`);
     },
     block(kind) {
-      // A block with no text before the next one (NET has empty <div class='p'>) is dropped.
+      // A block with no text before the next one (some EPUB sources have empty <div class='p'>) is dropped.
       if (kind !== 'b') pending = pending.filter(([k, text]) => text || k === 'b');
       pending.push([kind]);
     },
@@ -220,9 +205,9 @@ function parseUsfm(src) {
   }
 }
 
-// ---- NET Bible EPUB (one XHTML file per book, USFM-style classes) ----
+// ---- EPUB (one XHTML file per book, USFM-style classes) ----
 
-function parseNetEpub(src) {
+function parseEpub(src) {
   const files = walk(unzip(src));
   return CODES.map((code, b) => {
     const file = files.find(f => path.basename(f) === `${code}.xhtml`);
@@ -411,8 +396,13 @@ function splitTitle(t, donorTitle, donorVerse) {
 
 // ---- main ----
 
-const args = Object.fromEntries(process.argv.slice(2).map(a => a.split('=')));
-if (!Object.keys(args).length) { console.error('usage: build-versions.mjs bsb=<usfm.zip> net=<NET.epub> …'); process.exit(1); }
+const argv = process.argv.slice(2);
+const args = Object.fromEntries(argv.filter(a => a !== '--private').map(a => a.split('=')));
+if (argv.includes('--private')) {
+  if (!fs.existsSync(PRIVATE)) { console.error(`--private: no ${path.relative('.', PRIVATE)}`); process.exit(1); }
+  for (const [id, v] of Object.entries(VERSIONS)) if (!v.public && !(id in args)) args[id] = v.src;
+}
+if (!Object.keys(args).length) { console.error('usage: build-versions.mjs bsb=<usfm.zip> [<id>=<source> …] [--private]'); process.exit(1); }
 fs.mkdirSync(path.resolve('data', 'text'), { recursive: true });
 for (const [id, src] of Object.entries(args)) {
   const ver = VERSIONS[id];
@@ -440,10 +430,18 @@ for (const [id, src] of Object.entries(args)) {
 }
 
 // The list covers every version with a built file, so building one at a time works.
+// Public versions go to js/versions.js (tracked); licensed ones to
+// js/versions.local.js (gitignored), which tools/build-dist.mjs merges in.
 const built = Object.keys(VERSIONS).filter(id => fs.existsSync(path.resolve('data', 'text', `${id}.json`)));
-const list = built.map(id => ({ id, abbr: VERSIONS[id].abbr, name: VERSIONS[id].name, note: VERSIONS[id].note, public: !!VERSIONS[id].public }));
+const entry = id => ({ id, abbr: VERSIONS[id].abbr, name: VERSIONS[id].name, note: VERSIONS[id].note, public: !!VERSIONS[id].public });
+const pub = built.filter(id => VERSIONS[id].public), local = built.filter(id => !VERSIONS[id].public);
 fs.writeFileSync(path.resolve('js', 'versions.js'), `// Generated by tools/build-versions.mjs — do not edit.
 // A classic script too, so the service worker can importScripts() it.
-self.DWELL_VERSIONS = ${JSON.stringify(list, null, 2)};
+self.DWELL_VERSIONS = ${JSON.stringify(pub.map(entry), null, 2)};
 `);
-console.log(`js/versions.js: ${built.join(', ')}`);
+const localFile = path.resolve('js', 'versions.local.js');
+if (local.length) fs.writeFileSync(localFile, `// Generated by tools/build-versions.mjs — do not edit. Never committed (.gitignore).
+self.DWELL_VERSIONS.push(...${JSON.stringify(local.map(entry), null, 2)});
+`);
+else fs.rmSync(localFile, { force: true });
+console.log(`js/versions.js: ${pub.join(', ')}${local.length ? `; js/versions.local.js: ${local.join(', ')}` : ''}`);

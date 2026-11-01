@@ -21,7 +21,8 @@
 // deletions are tombstones; a history reset only moves forward. The log is
 // append-only and deduplicated by entry id. Every query is scoped to the
 // signed-in account.
-import '../js/versions.js';
+// The full version list, public and licensed, as built into dist/ (rake build).
+import '../dist/js/versions.js';
 import { sendMail, mailConfigured } from './mail.js';
 
 const VERSIONS = globalThis.DWELL_VERSIONS;

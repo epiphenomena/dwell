@@ -1,5 +1,6 @@
 # Dwell on Cloudflare: the static app (dist/, built by tools/build-dist.mjs)
 # behind a Worker (worker/index.js) that serves Bible text and the API.
+# `rake deploy` builds and deploys; see README.md for first-time setup.
 name = "dwell"
 main = "worker/index.js"
 compatibility_date = "2026-09-01"
@@ -21,13 +22,13 @@ run_worker_first = ["/api/*", "/text/*"]
 [[d1_databases]]
 binding = "DB"
 database_name = "dwell"
-database_id = "00000000-0000-0000-0000-000000000000" # your own (npx wrangler d1 create / kv namespace create)
+database_id = "d4ddfc25-1f54-414b-b736-079f8392e98c" # set by `rake cf:setup`
 migrations_dir = "worker/migrations"
 
 # Licensed Bible text (owner accounts only), one key per version: text:<id>
 [[kv_namespaces]]
 binding = "TEXT"
-id = "00000000000000000000000000000000" # your own (npx wrangler d1 create / kv namespace create)
+id = "a5518b93a02d4ce2a96dbd568b145e0e" # set by `rake cf:setup`
 
 [vars]
 SMTP_HOST = "smtp.dreamhost.com"
