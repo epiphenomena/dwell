@@ -22,14 +22,16 @@ export function initLocator(el, { reader, onOpen, onScrubStart }) {
   );
 
   let shownBook = -1, chapSegs = [], pageSegs = [];
-  function update({ book, s, page }) {
+  function update({ book, s, e, page }) {
     if (book !== shownBook) {
       shownBook = book;
       chapSegs = BOOKS[book].verses.map(n => h('i', { style: { flexGrow: n } }));
       bookTrack.replaceChildren(...chapSegs, bookMark);
       bibleSegs.forEach((seg, i) => seg.classList.toggle('is-current', i === book));
     }
-    const { c } = locate(s);
+    // The chapter this page ends in: where a chapter begins partway down the
+    // page, the page counts as its first.
+    const { c } = locate(e);
     chapSegs.forEach((seg, i) => seg.classList.toggle('is-current', i === c));
     const { first, count } = reader.chapterPages(c);
     if (count !== pageSegs.length) {

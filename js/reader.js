@@ -304,15 +304,18 @@ export class Reader extends EventTarget {
     this.#anim = requestAnimationFrame(frame);
   }
 
-  // The pages chapter c (of the current book) is on: first page and how many.
+  // Chapter c's pages (of the current book): first page and how many. A
+  // page belongs to the chapter it ends in, so a chapter that begins partway
+  // down a page starts there and the one before ends a page sooner.
   chapterPages(c) {
     const verses = BOOKS[this.book].verses;
     let start = 0;
     for (let i = 0; i < c; i++) start += verses[i];
     const end = start + verses[c] - 1;
-    const first = this.vStart[start];
+    let first = this.vStart[start];
+    while (first + 1 < this.pages && this.pageLast[first] < start) first++;
     let last = first;
-    while (last + 1 < this.pages && this.pageFirst[last + 1] <= end) last++;
+    while (last + 1 < this.pages && this.pageLast[last + 1] <= end) last++;
     return { first, count: last - first + 1 };
   }
 
