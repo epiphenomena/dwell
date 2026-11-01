@@ -1,6 +1,6 @@
-// Unobtrusive position indicator: three hairlines — the current book
-// (chapter segments), then the Old Testament and the New Testament (book
-// segments). Tap to open the navigator; drag to scrub through the book.
+// Unobtrusive position indicator: four hairlines — the current chapter
+// (page segments), the current book (chapter segments), then the Old
+// Testament and the New Testament (book segments). Tap to open the navigator; drag to scrub through the book.
 import { h } from '../dom.js';
 import { BOOKS, OT_BOOKS, bookStart, locate, fmtRef } from '../canon.js';
 
@@ -10,17 +10,19 @@ export function initLocator(el, { reader, onOpen, onScrubStart }) {
     from, to, s: bookStart[from], e: bookStart[to],
     mark: h('b', { class: 'locator__mark' }),
   }));
+  const chapterTrack = h('div', { class: 'locator__track locator__track--chapter' });
   const bookTrack = h('div', { class: 'locator__track locator__track--book' });
   const bookMark = h('b', { class: 'locator__mark' });
   const bubble = h('div', { class: 'locator__bubble' });
   el.append(
+    chapterTrack,
     bookTrack,
     ...testaments.map(t => h('div', { class: 'locator__track locator__track--bible' }, bibleSegs.slice(t.from, t.to), t.mark)),
     bubble,
   );
 
-  let shownBook = -1, chapSegs = [];
-  function update({ book, s }) {
+  let shownBook = -1, chapSegs = [], pageSegs = [];
+  function update({ book, s, page }) {
     if (book !== shownBook) {
       shownBook = book;
       chapSegs = BOOKS[book].verses.map(n => h('i', { style: { flexGrow: n } }));
@@ -29,6 +31,12 @@ export function initLocator(el, { reader, onOpen, onScrubStart }) {
     }
     const { c } = locate(s);
     chapSegs.forEach((seg, i) => seg.classList.toggle('is-current', i === c));
+    const { first, count } = reader.chapterPages(c);
+    if (count !== pageSegs.length) {
+      pageSegs = Array.from({ length: count }, () => h('i', { style: { flexGrow: 1 } }));
+      chapterTrack.replaceChildren(...pageSegs);
+    }
+    pageSegs.forEach((seg, i) => seg.classList.toggle('is-current', first + i === page));
     const bookLen = bookStart[book + 1] - bookStart[book];
     for (const t of testaments) {
       const here = book >= t.from && book < t.to;

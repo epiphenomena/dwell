@@ -1,4 +1,5 @@
-/* Position hairlines: the current book (chapter segments), then OT and NT. */
+/* Position hairlines: the current chapter (page segments), the current book
+   (chapter segments), then OT and NT. */
 .bottom {
   position: relative;
   padding: 0 calc(var(--gutter) + var(--safe-r)) var(--safe-b) calc(var(--gutter) + var(--safe-l));
