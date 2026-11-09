@@ -35,6 +35,9 @@ export class Reader extends EventTarget {
     this.vStart = [];
     this.pageFirst = [];
     this.pageLast = [];
+    this.vEnd = []; // per verse: the page it ends on
+    this.vBottom = []; // per verse: where it ends on its last page, in lines
+    this.pageLines = []; // per page: how many lines of verses it holds
     this.selection = null;
     this.selAnchor = null;
     this.decorator = null;
@@ -239,22 +242,28 @@ export class Reader extends EventTarget {
     this.#slideTo(0);
     this.step = w;
 
-    const left = this.flow.getBoundingClientRect().left;
+    const { left, top } = this.flow.getBoundingClientRect();
+    // Lines keep a grid down the page, so an inline box's bottom rounds to
+    // the line it sits on.
+    const lh = parseFloat(getComputedStyle(this.flow).lineHeight);
     const n = this.verseEls.length;
-    const vStart = new Array(n);
-    const pageFirst = [], pageLast = [];
+    const vStart = new Array(n), vEnd = new Array(n), vBottom = new Array(n);
+    const pageFirst = [], pageLast = [], pageLines = [];
     for (let i = 0; i < n; i++) {
-      let lo = Infinity, hi = -1;
+      let lo = Infinity, hi = -1, y1 = 0;
       for (const el of this.verseEls[i]) {
         for (const r of el.getClientRects()) {
           if (r.width < 1) continue;
           const p = Math.floor((r.left - left + 1) / w);
+          const b = Math.ceil((r.bottom - top - 1) / lh);
+          if (p > hi || (p === hi && b > y1)) y1 = b;
           if (p < lo) lo = p;
           if (p > hi) hi = p;
+          if (!(pageLines[p] >= b)) pageLines[p] = b;
         }
       }
-      if (hi < 0) lo = hi = i ? vStart[i - 1] : 0;
-      vStart[i] = lo;
+      if (hi < 0) { lo = hi = i ? vEnd[i - 1] : 0; y1 = i ? vBottom[i - 1] : 0; }
+      vStart[i] = lo; vEnd[i] = hi; vBottom[i] = y1;
       for (let p = lo; p <= hi; p++) {
         if (pageFirst[p] === undefined) pageFirst[p] = i;
         pageLast[p] = i;
@@ -268,7 +277,7 @@ export class Reader extends EventTarget {
         pageLast[p] = pageFirst[p];
       }
     }
-    Object.assign(this, { vStart, pageFirst, pageLast, pages });
+    Object.assign(this, { vStart, vEnd, vBottom, pageFirst, pageLast, pageLines, pages });
   }
 
   #setPage(p, { animate = false, fade = false, silent = false } = {}) {
@@ -304,19 +313,24 @@ export class Reader extends EventTarget {
     this.#anim = requestAnimationFrame(frame);
   }
 
-  // Chapter c's pages (of the current book): first page and how many. A
-  // page belongs to the chapter it ends in, so a chapter that begins partway
-  // down a page starts there and the one before ends a page sooner.
+  // Chapter c's pages (of the current book): the first page it's on, and
+  // for each page from there how much of it, 0..1, is this chapter. A page
+  // shared with the chapter before or after counts only its share.
   chapterPages(c) {
     const verses = BOOKS[this.book].verses;
     let start = 0;
     for (let i = 0; i < c; i++) start += verses[i];
     const end = start + verses[c] - 1;
-    let first = this.vStart[start];
-    while (first + 1 < this.pages && this.pageLast[first] < start) first++;
-    let last = first;
-    while (last + 1 < this.pages && this.pageLast[last + 1] <= end) last++;
-    return { first, count: last - first + 1 };
+    const first = this.vStart[start], last = this.vEnd[end];
+    const shares = [];
+    for (let p = first; p <= last; p++) {
+      const lines = this.pageLines[p] || 1;
+      // Headings between two chapters go with the second.
+      const from = p === first && start > 0 && this.vEnd[start - 1] === p ? this.vBottom[start - 1] : 0;
+      const to = p === last ? this.vBottom[end] : lines;
+      shares.push(Math.max(0, Math.min(1, (to - from) / lines)));
+    }
+    return { first, shares };
   }
 
   state() {

@@ -1,6 +1,7 @@
 // Unobtrusive position indicator: four hairlines — the current chapter
-// (page segments), the current book (chapter segments), then the Old
-// Testament and the New Testament (book segments). Tap to open the navigator; drag to scrub through the book.
+// (page segments; a page it shares is sized by its share), the current book
+// (chapter segments), then the Old Testament and the New Testament (book
+// segments). Tap to open the navigator; drag to scrub through the book.
 import { h } from '../dom.js';
 import { BOOKS, OT_BOOKS, bookStart, locate, fmtRef } from '../canon.js';
 
@@ -33,11 +34,14 @@ export function initLocator(el, { reader, onOpen, onScrubStart }) {
     // page, the page counts as its first.
     const { c } = locate(e);
     chapSegs.forEach((seg, i) => seg.classList.toggle('is-current', i === c));
-    const { first, count } = reader.chapterPages(c);
-    if (count !== pageSegs.length) {
-      pageSegs = Array.from({ length: count }, () => h('i', { style: { flexGrow: 1 } }));
+    // A page shared with the next or previous chapter is only as long as
+    // this chapter's share of it.
+    const { first, shares } = reader.chapterPages(c);
+    if (shares.length !== pageSegs.length) {
+      pageSegs = shares.map(() => h('i'));
       chapterTrack.replaceChildren(...pageSegs);
     }
+    pageSegs.forEach((seg, i) => { seg.style.flexGrow = shares[i]; });
     pageSegs.forEach((seg, i) => seg.classList.toggle('is-current', first + i === page));
     const bookLen = bookStart[book + 1] - bookStart[book];
     for (const t of testaments) {
