@@ -7,7 +7,7 @@ home: wally
 zmx: w.bible
 waiting_on: [Review of the merge-py branch]
 blocked: []
-next: [Review and merge merge-py into main, Retire the old fossil checkout]
+next: [Review and merge merge-py into main, Deploy and check the tap fixes on the phone, Retire the old fossil checkout]
 ---
 ## Upkeep
 - **Public repo:** anyone can read this file. Nothing private -- no names, emails, secrets or personal details.
@@ -21,9 +21,9 @@ next: [Review and merge merge-py into main, Retire the old fossil checkout]
 - [x] Three pins and the ribbon in one row; selecting starts in Link; Open in Blue Letter Bible
 - [x] Fullscreen as one setting; page height kept as system bars come and go; page centered
 - [x] Fourth locator hairline: the current chapter's pages
-- [ ] Tapping a cross reference sometimes jumps to the other passage; it should always open the links page <!-- cap:h11 -->
-- [ ] Blue Letter Bible links open in a child browser window instead of in the app <!-- cap:h12 -->
-- [ ] Tap to select a verse is detected inconsistently <!-- cap:h13 -->
+- [x] Tapping a cross reference sometimes jumps to the other passage; it should always open the links page <!-- cap:h11 -->
+- [ ] Blue Letter Bible links open in a child browser window instead of in the app; now an Android intent for the BLB app, to confirm on the phone <!-- cap:h12 -->
+- [x] Tap to select a verse is detected inconsistently <!-- cap:h13 -->
 ### Backend
 - [x] Cloudflare Worker + D1 (accounts, records, log) + KV (licensed text, owner accounts only)
 - [x] Email sign-in links over SMTP; per-account sync
@@ -49,6 +49,8 @@ next: [Review and merge merge-py into main, Retire the old fossil checkout]
 ### at deploy
 - `rake deploy` = check + build + wrangler deploy + verify. `rake check` needs every version's text present under `data/text/`.
 - `rake cf:texts` after `rake text` changes a licensed version.
+### at the next deploy
+- On the phone: a marked verse number opens its references; taps between lines select; the BLB button opens the BLB app.
 ### once merge-py is merged
 - Retire the old fossil checkout (it was the working copy until 2026-10-31) and its ignore-glob lines.
 - Claude's project memory for this directory still says to work in the fossil checkout; update it.
@@ -58,6 +60,7 @@ next: [Review and merge merge-py into main, Retire the old fossil checkout]
 ## Inbox
 
 ## Done
+- 2026-11-08 Reader taps: the click after a tap no longer lands on the references sheet; taps between lines select their verse; the BLB link is an intent for the Android app. Not deployed yet.
 - 2026-11-01 Licensed versions' names moved out of the tracked files, the Blue Letter Bible list included; merge-py's own commits add none of them.
 - 2026-11-01 Merged the fossil checkout's 2026-10-31 locator work into branch merge-py.
 - 2026-10-19 Pin and selection changes, deployed and pushed.
