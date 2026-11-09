@@ -5,9 +5,9 @@ priority: 2
 goal: A mobile-first Bible reader PWA with flipping pages, pins, cross references, tags, notes and reading history; static app behind a Cloudflare Worker with accounts and sync.
 home: wally
 zmx: w.bible
-waiting_on: [Phone check of the tap fixes and the BLB link]
+waiting_on: []
 blocked: []
-next: [Check the tap fixes, the BLB link and the chapter hairline on the phone]
+next: [Find why the BLB link doesn't open the BLB app (low priority)]
 ---
 ## Upkeep
 - **Public repo:** anyone can read this file. Nothing private -- no names, emails, secrets or personal details.
@@ -23,7 +23,7 @@ next: [Check the tap fixes, the BLB link and the chapter hairline on the phone]
 - [x] Fourth locator hairline: the current chapter's pages
 - [x] Chapter pages hairline: a shared first or last page sized by the chapter's share of it
 - [x] Tapping a cross reference sometimes jumps to the other passage; it should always open the links page <!-- cap:h11 -->
-- [ ] Blue Letter Bible links open in a child browser window instead of in the app; now an Android intent for the BLB app, to confirm on the phone <!-- cap:h12 -->
+- [ ] Blue Letter Bible links open in a child browser window instead of in the app; the Android intent for the BLB app (v27) still doesn't open the app. Low priority <!-- cap:h12 -->
 - [x] Tap to select a verse is detected inconsistently <!-- cap:h13 -->
 ### Backend
 - [x] Cloudflare Worker + D1 (accounts, records, log) + KV (licensed text, owner accounts only)
@@ -51,14 +51,13 @@ next: [Check the tap fixes, the BLB link and the chapter hairline on the phone]
 ### at deploy
 - `rake deploy` = check + build + wrangler deploy + verify. `rake check` needs every version's text present under `data/text/`.
 - `rake cf:texts` after `rake text` changes a licensed version.
-### on the phone (deployed 2026-11-08, v28)
-- the chapter hairline's end segments look right on shared pages; a marked verse number opens its references; taps between lines select; the BLB button opens the BLB app.
 
 ## Ideas
 
 ## Inbox
 
 ## Done
+- 2026-11-08 Tap fixes and the chapter hairline confirmed on the phone.
 - 2026-11-08 Old fossil checkout retired: removed from the py repo with its globs, the directory moved to the trash.
 - 2026-11-08 Reader taps: the click after a tap no longer lands on the references sheet; taps between lines select their verse; the BLB link is an intent for the Android app. Deployed.
 - 2026-11-08 Chapter pages hairline sizes shared end pages by share; deployed (v28).
