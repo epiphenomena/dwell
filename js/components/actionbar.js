@@ -13,7 +13,9 @@ import { version } from '../text.js';
 // A version's own `blb` field (js/versions.js, or the gitignored
 // js/versions.local.js for licensed ones) names its code there; the set
 // below covers ids that are already BLB codes.
-// On Android the BLB app claims these links; on iOS they open in Safari.
+// On Android an installed app's ordinary link opens in a custom tab, which
+// never offers the BLB app, so there the link is an intent for it, falling
+// back to the web page when the app isn't installed. On iOS it opens in Safari.
 const BLB_BOOKS = `gen exo lev num deu jos jdg rth 1sa 2sa 1ki 2ki 1ch 2ch ezr neh est job
   psa pro ecc sng isa jer lam eze dan hos joe amo oba jon mic nah hab zep hag zec mal
   mat mar luk jhn act rom 1co 2co gal eph phl col 1th 2th 1ti 2ti tit phm heb jas 1pe 2pe
@@ -29,12 +31,21 @@ function blbUrl(s, e) {
   return `https://www.blueletterbible.org/${v}/${BLB_BOOKS[A.b]}/${A.c + 1}/${verses}/`;
 }
 
+const ANDROID = /Android/i.test(navigator.userAgent);
+const BLB_PACKAGE = 'org.blueletterbible.blb';
+
+function blbLink(url) {
+  if (!ANDROID) return url;
+  const fallback = encodeURIComponent(url);
+  return `intent://${url.slice('https://'.length)}#Intent;scheme=https;package=${BLB_PACKAGE};S.browser_fallback_url=${fallback};end`;
+}
+
 export function initActionBar(el, { reader, dock, onStar, onTag, onNote, onCopy, onInfo }) {
   let mode = 'link';
   const ref = h('button', { class: 'actionbar__ref', onclick: () => onInfo(reader.selection) });
   const starBtn = h('button', { class: 'actionbar__btn actionbar__star', 'aria-label': 'Star', 'aria-pressed': 'false', onclick: () => onStar(reader.selection) }, svg(ICONS.star));
   const linkBtn = h('button', { class: 'actionbar__btn', 'aria-label': 'Cross reference with a pin', onclick: () => setMode(mode === 'link' ? 'place' : 'link') }, svg(ICONS.link));
-  const blbBtn = h('a', { class: 'actionbar__btn', 'aria-label': 'Open in Blue Letter Bible', target: '_blank', rel: 'noopener' }, svg(ICONS.book));
+  const blbBtn = h('a', { class: 'actionbar__btn', 'aria-label': 'Open in Blue Letter Bible', target: ANDROID ? null : '_blank', rel: 'noopener' }, svg(ICONS.book));
   el.append(
     h('button', { class: 'actionbar__btn', 'aria-label': 'Clear selection', onclick: () => reader.clearSelection() }, svg(ICONS.close)),
     h('div', { class: 'actionbar__main' }, ref),
@@ -60,7 +71,7 @@ export function initActionBar(el, { reader, dock, onStar, onTag, onNote, onCopy,
     starBtn.classList.toggle('is-on', a.stars.length > 0);
     starBtn.setAttribute('aria-pressed', String(a.stars.length > 0));
     starBtn.setAttribute('aria-label', a.stars.length ? 'Unstar' : 'Star');
-    blbBtn.href = blbUrl(sel.s, sel.e);
+    blbBtn.href = blbLink(blbUrl(sel.s, sel.e));
     ref.replaceChildren(fmtRange(sel.s, sel.e, true), n ? h('span', { class: 'actionbar__count' }, n) : '');
     setMode(mode);
   }

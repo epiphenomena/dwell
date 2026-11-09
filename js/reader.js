@@ -352,7 +352,9 @@ export class Reader extends EventTarget {
     const root = this.root;
     let d = null;
     root.addEventListener('pointerdown', e => {
-      if (e.button !== 0 || d) return;
+      // A new primary pointer means every earlier one has ended, even if
+      // its pointerup never reached us; don't let a stale one block taps.
+      if (e.button !== 0 || (d && !e.isPrimary)) return;
       d = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), dx: 0, drag: false, vert: false };
     });
     root.addEventListener('pointermove', e => {
@@ -388,12 +390,31 @@ export class Reader extends EventTarget {
           this.dispatchEvent(new CustomEvent('swipe', { detail: dy < 0 ? 'up' : 'down' }));
         }
       } else if (e.type === 'pointerup' && dist < 10 && dt < 600) {
+        swallowClick();
         this.#tap(e);
       }
       d = null;
     };
     root.addEventListener('pointerup', end);
     root.addEventListener('pointercancel', end);
+  }
+
+  // The verse under a tap. Verses are inline, and an inline box is only as
+  // tall as its font: the leading between lines belongs to the paragraph. A
+  // tap there looks a few pixels up and down for the nearest line.
+  #verseAt(e) {
+    const hit = el => (this.flow.contains(el) ? el.closest('.v') : null);
+    const v = hit(e.target);
+    if (v) return v;
+    const reach = parseFloat(getComputedStyle(this.flow).fontSize) * 0.5;
+    for (let dy = 2; dy <= reach; dy += 2) {
+      for (const y of [e.clientY - dy, e.clientY + dy]) {
+        const el = document.elementFromPoint(e.clientX, y);
+        const found = el && hit(el);
+        if (found) return found;
+      }
+    }
+    return null;
   }
 
   #tap(e) {
@@ -410,10 +431,19 @@ export class Reader extends EventTarget {
     // Outer edges flip; the text column selects verses.
     if (x < 0.14) return this.prev();
     if (x > 0.86) return this.next();
-    const v = e.target.closest?.('.v');
+    const v = this.#verseAt(e);
     if (v) this.#tapVerse(+v.dataset.id);
     else this.dispatchEvent(new CustomEvent('tapblank'));
   }
+}
+
+// Taps are handled at pointerup, and the browser's click follows at the same
+// spot. Anything a tap opens there (the references sheet) would take that
+// click: a passage row under the finger would jump straight to its passage.
+function swallowClick() {
+  const stop = e => { e.stopPropagation(); e.preventDefault(); };
+  addEventListener('click', stop, { capture: true, once: true });
+  setTimeout(() => removeEventListener('click', stop, { capture: true }), 500);
 }
 
 // One verse per line: no paragraphs or poetry, but psalm titles (part of the
