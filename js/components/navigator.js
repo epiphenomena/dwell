@@ -13,7 +13,7 @@ export function openNavigator({ reader, go }) {
   const input = h('input', {
     class: 'nav__input', type: 'text', inputmode: 'search', enterkeyhint: 'go',
     autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false',
-    placeholder: 'Go to… e.g. jn 3:16, ps 23, rom 8:28-39',
+    placeholder: 'jn 3:16 · ps 23 · rom 8:28-39',
   });
   const preview = h('div', { class: 'nav__preview' });
   input.addEventListener('input', () => {

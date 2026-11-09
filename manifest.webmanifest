@@ -1,7 +1,7 @@
 {
   "name": "Dwell",
   "short_name": "Dwell",
-  "description": "A quiet, page-flipping Bible reader with pins, cross references, notes and a reading heatmap.",
+  "description": "Bible reader: pins, cross references, notes, reading heatmap.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

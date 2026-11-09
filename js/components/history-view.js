@@ -42,8 +42,8 @@ export function openHistory({ go, tab = 'heatmap' }) {
     streak.replaceChildren(
       h('div', { class: 'streak__now' }, h('strong', {}, current), h('span', {}, 'day streak')),
       h('div', { class: 'streak__meta' },
-        current ? (today ? 'Read at the ribbon today' : 'Read today to keep it going') : 'Read at the ribbon to start one',
-        h('br'), `Longest: ${days(longest)}`),
+        today ? 'Today ✓' : null,
+        today ? h('br') : null, `Longest: ${days(longest)}`),
     );
   }
 
@@ -117,7 +117,7 @@ export function openHistory({ go, tab = 'heatmap' }) {
       more.hidden = shown >= all.length;
     }
     page();
-    content.replaceChildren(all.length ? list : h('p', { class: 'empty' }, kind() === 'ribbon' ? 'Nothing read at the ribbon yet.' : 'Nothing read yet.'), more);
+    content.replaceChildren(all.length ? list : h('p', { class: 'empty' }, kind() === 'ribbon' ? 'Nothing read at the ribbon.' : 'Nothing read.'), more);
   }
 
   show(tab);

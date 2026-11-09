@@ -66,7 +66,7 @@ export async function requestSignIn(email) {
 // Sign in with a token (pasted, or from a sign-in link).
 export async function useToken(raw) {
   const t = String(raw || '').trim().replace(/^.*#token=/, '');
-  if (!/^[A-Za-z0-9_-]{20,128}$/.test(t)) throw new Error('That doesn’t look like a sign-in token');
+  if (!/^[A-Za-z0-9_-]{20,128}$/.test(t)) throw new Error('Not a token');
   const before = token();
   set(TOKEN, t);
   let res;
@@ -78,7 +78,7 @@ export async function useToken(raw) {
   }
   if (!res.ok) {
     set(TOKEN, before);
-    throw new Error(res.status === 401 ? 'That token isn’t valid (it may have been used to sign out)' : `Server error ${res.status}`);
+    throw new Error(res.status === 401 ? 'Token not valid' : `Server error ${res.status}`);
   }
   me = await res.json();
   set(ME, JSON.stringify(me));

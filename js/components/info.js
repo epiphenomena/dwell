@@ -20,7 +20,7 @@ export function openInfo(sel, { go }) {
   function groupBlock(g) {
     const here = g.refs.filter(r => overlaps(sel.s, sel.e, r.s, r.e));
     const others = g.refs.filter(r => !here.includes(r));
-    const nameInput = h('input', { class: 'field field--inline', type: 'text', placeholder: 'Name this group (makes it a tag)', enterkeyhint: 'done', autocapitalize: 'off' });
+    const nameInput = h('input', { class: 'field field--inline', type: 'text', placeholder: 'Tag name', enterkeyhint: 'done', autocapitalize: 'off' });
     nameInput.addEventListener('keydown', e => { if (e.key === 'Enter' && nameInput.value.trim()) { store.nameGroup(g.id, nameInput.value); render(); } });
     return h('div', { class: 'refgroup' },
       h('div', { class: 'refgroup__head' },
@@ -29,7 +29,7 @@ export function openInfo(sel, { go }) {
         h('button', { class: 'refgroup__leave', onclick: () => { here.forEach(r => store.removeRef(g.id, r)); render(); } }, g.name ? 'Remove from tag' : 'Unlink'),
       ),
       others.length ? others.map(r => passageRow(r, { onGo: s => go(s, { flash: r.e }), onRemove: () => { store.removeRef(g.id, r); render(); } }))
-        : h('p', { class: 'empty empty--small' }, 'No other passages yet.'),
+        : h('p', { class: 'empty empty--small' }, 'No other passages.'),
       g.name ? null : nameInput,
     );
   }

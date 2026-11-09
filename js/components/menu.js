@@ -104,7 +104,6 @@ export function openMenu({ go, setFullscreen }) {
     h('h3', { class: 'list__group' }, 'Sync'),
     syncBox,
     h('h3', { class: 'list__group' }, 'Backup file'),
-    h('p', { class: 'menu__note' }, 'A JSON file of everything on this device.'),
     h('div', { class: 'form__row' },
       h('button', { class: 'btn', onclick: exportBackup }, 'Export backup'),
       importBtn, fileInput,
@@ -146,10 +145,11 @@ const HOW_TO = [
   ['Selecting verses', 'Tap a verse to select it; tap another to extend the selection. Tap a selected verse to clear it.'],
   ['Pins', 'With verses selected, tap a pin to place it there. Tap a pin to go to its passage. Hold a pin to clear it.'],
   ['The ribbon', 'Tap the ribbon to place it on the page you are reading; it moves along as you read on. Tap it later to return; hold it to move it to this page. Reading at the ribbon has its own history and streak.'],
-  ['Stars', 'Select verses and tap the asterisk to star them; they get an underline in the star color, easy to spot while flipping. Tap the asterisk again on a starred passage to unstar it.'],
+  ['Stars', 'Select verses and tap the asterisk to star them; they get an underline in the star color. Tap the asterisk again on a starred passage to unstar it.'],
   ['References and tags', 'With verses selected, tap the link button and then a pin to cross-reference the two. Tag verses to group them with other passages. Marked verse numbers open what is attached to them.'],
   ['Notes', 'Select verses and tap the note button, or start one from Notes. Attach passages with the pin buttons at the foot of a note. Swipe up on the text to open your latest note.'],
   ['Search', 'Words match at their start, so “love” also finds loved and loves. Put a phrase in quotes to match it exactly. Notes have their own filter too.'],
+  ['Sync', 'Sign in to keep pins, stars, notes and reading history in step across your devices. Everything works on this device without an account. Your email address is used only to send you sign-in links. A device stays signed in until you sign out.'],
   ['History', 'Swipe down on the text to open the timeline. Hold the back arrow for history. Back and forward step between places you jumped to.'],
 ];
 
@@ -165,7 +165,7 @@ function howTo() {
 function closedVersions() {
   return h('div', { class: 'closed' },
     h('p', {}, 'Dwell offers the Berean Standard Bible, which its translators gave to the public domain so that anyone may read, copy and share it.'),
-    h('p', {}, 'Most modern translations are not like that. They are copyrighted, and their publishers charge licensing fees and restrict where the text may appear, so a free reader like this one can’t include them.'),
+    h('p', {}, 'Other translations are copyrighted and licensed.'),
     h('p', {}, '“Freely you have received; freely give” (Matthew 10:8). The word of God should not be paywalled.'),
   );
 }
@@ -180,10 +180,10 @@ function renderSignIn(box) {
     msg.textContent = 'Sending…';
     try {
       await acct.requestSignIn(email.value);
-      msg.textContent = `Sent. Open the link in the email to ${email.value.trim()}, or paste its token below.`;
+      msg.textContent = `Sent to ${email.value.trim()}`;
     } catch (err) { msg.textContent = err.message; }
     send.disabled = false;
-  } }, 'Email me a sign-in link');
+  } }, 'Email link');
   email.addEventListener('keydown', e => { if (e.key === 'Enter') send.click(); });
   const tokenIn = h('input', { class: 'field', type: 'text', placeholder: 'Paste a sign-in token', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
   const use = h('button', { class: 'btn btn--ghost', onclick: async () => {
@@ -191,9 +191,9 @@ function renderSignIn(box) {
   } }, 'Sign in');
   tokenIn.addEventListener('keydown', e => { if (e.key === 'Enter') use.click(); });
   fill(box,
-    h('p', { class: 'menu__note' }, 'Sign in to keep pins, stars, notes and reading history in step across your devices. Everything works on this device without an account. Your email address is used only to send you sign-in links.'),
+    h('p', { class: 'menu__note' }, 'Sync across devices'),
     email, h('div', { class: 'form__row' }, send),
-    h('details', { class: 'tokenin' }, h('summary', { class: 'menu__note' }, 'Have a token?'), tokenIn, h('div', { class: 'form__row' }, use)),
+    h('details', { class: 'tokenin' }, h('summary', { class: 'menu__note' }, 'Token'), tokenIn, h('div', { class: 'form__row' }, use)),
     msg,
   );
 }
@@ -203,7 +203,7 @@ function renderSync(box) {
   const s = status();
   if (!s.signedIn) return renderSignIn(box);
   if (!s.available) {
-    fill(box, h('p', { class: 'menu__note' }, 'Sync is off: this copy is served without its backend, so everything stays on this device.'));
+    fill(box, h('p', { class: 'menu__note' }, 'Sync unavailable'));
     return;
   }
   const line = s.running ? 'Syncing…'
@@ -211,14 +211,13 @@ function renderSync(box) {
     : s.last ? `Synced ${fmtAgo(s.last)}` : 'Not synced yet';
   fill(box,
     h('p', { class: `sync__status${s.error ? ' is-error' : ''}` }, h('i', { class: 'sync__dot' }), line),
-    h('p', { class: 'menu__note' }, 'Pins, stars, references, notes and reading history are saved to your account.'),
     h('div', { class: 'form__row' },
       h('button', { class: 'btn', disabled: s.running, onclick: () => syncNow() }, 'Sync now'),
       h('button', { class: 'btn btn--ghost', onclick: async () => {
         try { download(await exportServer(), 'dwell-server'); } catch (err) { toast(err.message); }
       } }, 'Download server backup'),
     ),
-    h('p', { class: 'menu__note' }, `Signed in as ${acct.current()?.email ?? 'your account'}. This device stays signed in until you sign out.`),
+    h('p', { class: 'menu__note' }, `Signed in · ${acct.current()?.email ?? 'your account'}`),
     h('div', { class: 'form__row' }, signOutButton()),
   );
 }
@@ -231,7 +230,7 @@ function signOutButton() {
     btn.disabled = true;
     await syncNow(); // nothing unsynced is left behind
     await acct.signOut();
-  } }, 'Sign out of this device');
+  } }, 'Sign out');
   return btn;
 }
 

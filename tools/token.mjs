@@ -23,4 +23,4 @@ INSERT INTO tokens (hash, user_id, created) SELECT ${q(hash)}, id, ${now} FROM u
 
 execFileSync('npx', ['wrangler', 'd1', 'execute', 'dwell', where, '--command', sql], { stdio: ['ignore', 'ignore', 'inherit'] });
 const site = where === '--local' ? 'http://127.0.0.1:8787' : 'https://dwell.literal.work';
-console.log(`Signed-in token for ${email} (keep it private):\n\n  ${token}\n\nOpen ${site}/#token=${token}\nor paste the token into Dwell: Menu › Sync › Have a token?`);
+console.log(`Signed-in token for ${email} (keep it private):\n\n  ${token}\n\nOpen ${site}/#token=${token}\nor paste the token into Dwell: Menu › Sync › Token`);

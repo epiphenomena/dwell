@@ -36,7 +36,7 @@ export function openNotes({ go }) {
   });
   function render() {
     if (!store.notes.length) {
-      list.replaceChildren(h('p', { class: 'empty' }, 'No notes yet.'));
+      list.replaceChildren(h('p', { class: 'empty' }, 'No notes.'));
       return;
     }
     const q = filter.value.trim();
@@ -56,7 +56,7 @@ export function openNotes({ go }) {
 
 // `resume` puts the caret at the end, ready to carry on writing.
 export function openNote(note, { go, isNew = false, resume = false }) {
-  const body = h('textarea', { class: 'note__body', placeholder: 'Write…' });
+  const body = h('textarea', { class: 'note__body' });
   body.value = note.body;
   let t;
   body.addEventListener('input', () => {
@@ -101,7 +101,7 @@ export function openNote(note, { go, isNew = false, resume = false }) {
   // Tag input with suggestions from the tags already in use: plain chips,
   // since <datalist> shows nothing in some mobile browsers (Firefox).
   function renderTags() {
-    const input = h('input', { class: 'note__tagin', type: 'text', placeholder: note.tags.length ? 'Add tag' : 'Add a tag…', enterkeyhint: 'done', autocapitalize: 'off', autocomplete: 'off', spellcheck: 'false' });
+    const input = h('input', { class: 'note__tagin', type: 'text', placeholder: 'Add tag', enterkeyhint: 'done', autocapitalize: 'off', autocomplete: 'off', spellcheck: 'false' });
     const add = (value, refocus = true) => {
       const name = cleanName(value);
       if (name && !note.tags.includes(name)) { note.tags.push(name); store.updateNote(note); }

@@ -113,10 +113,10 @@ async function allow(env, key, max, seconds) {
 async function signin(request, env, url) {
   const email = normEmail((await body(request)).email);
   if (!email) return json({ error: 'Enter an email address' }, 400);
-  if (!mailConfigured(env)) return json({ error: 'Sign-in email isn’t set up on this server yet' }, 503);
+  if (!mailConfigured(env)) return json({ error: 'Email not configured' }, 503);
   const ip = request.headers.get('CF-Connecting-IP') || 'local';
   if (!await allow(env, `mail:${email}`, 1, 60) || !await allow(env, `ip:${ip}`, 10, 3600)) {
-    return json({ error: 'Too many sign-in emails. Try again in a few minutes.' }, 429);
+    return json({ error: 'Too many requests. Wait a few minutes.' }, 429);
   }
   const now = Date.now();
   const token = newToken();
@@ -133,15 +133,15 @@ async function signin(request, env, url) {
     await sendMail(env, {
       to: email,
       subject: 'Sign in to Dwell',
-      text: `Open this link to sign in to Dwell on this device:\n\n${link}\n\nOr paste this token into Dwell (Menu › Sync › Have a token?):\n\n${token}\n\nThe token stays signed in until you sign out. If you didn’t ask for this, ignore this email.\n`,
-      html: `<p>Open this link to sign in to Dwell on this device:</p><p><a href="${link}">Sign in to Dwell</a></p>`
-        + `<p>Or paste this token into Dwell (Menu › Sync › Have a token?):</p><p><code style="font-size:15px">${token}</code></p>`
-        + '<p>The token stays signed in until you sign out. If you didn’t ask for this, ignore this email.</p>',
+      text: `Sign in:\n\n${link}\n\nToken (Menu › Sync):\n\n${token}\n\nIf you didn’t ask for this, ignore this email.\n`,
+      html: `<p>Sign in:</p><p><a href="${link}">Sign in to Dwell</a></p>`
+        + `<p>Token (Menu › Sync):</p><p><code style="font-size:15px">${token}</code></p>`
+        + '<p>If you didn’t ask for this, ignore this email.</p>',
     });
   } catch (err) {
     console.error('sign-in email failed', err);
     await env.DB.prepare('DELETE FROM tokens WHERE hash = ?').bind(hash).run();
-    return json({ error: 'Couldn’t send the email. Try again in a little while.' }, 502);
+    return json({ error: 'Email failed' }, 502);
   }
   return json({ ok: true });
 }
@@ -159,7 +159,7 @@ async function text(request, env, ctx, url) {
   }
   const user = await auth(request, env, ctx);
   if (!user) return json({ error: 'Sign in to read this version' }, 401);
-  if (!user.owner) return json({ error: 'This version isn’t available to this account' }, 403);
+  if (!user.owner) return json({ error: 'Not available' }, 403);
   const body = await env.TEXT.get(`text:${id}`, { type: 'stream' });
   if (!body) return new Response('Not found', { status: 404 });
   return new Response(body, {

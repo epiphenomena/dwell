@@ -33,7 +33,7 @@ export function openTags({ go }) {
   const sheet = openSheet({ title: 'Tags', body });
   function render(open) {
     const names = store.tagNames();
-    if (!names.length) return fill(body, h('p', { class: 'empty' }, 'No tags yet.'));
+    if (!names.length) return fill(body, h('p', { class: 'empty' }, 'No tags.'));
     fill(body, names.map(([name, n]) => {
       const group = store.tag(name);
       const refs = group ? [...group.refs].sort((a, b) => a.s - b.s) : [];
@@ -58,7 +58,7 @@ export function openCrossRefs({ go }) {
     fill(body, links.length ? links.map(g => h('div', { class: 'refpair' },
       g.refs.map(r => passageRow(r, { onGo: s => go(s, { flash: r.e }) })),
       h('button', { class: 'refgroup__leave', onclick: () => { store.removeGroup(g.id); render(); } }, 'Unlink'),
-    )) : h('p', { class: 'empty' }, 'No cross references yet.'));
+    )) : h('p', { class: 'empty' }, 'No cross references.'));
   }
   render();
   return sheet;
@@ -72,7 +72,7 @@ export function openStars({ go }) {
     const stars = [...store.stars].sort((a, b) => a.s - b.s);
     fill(body, stars.length
       ? stars.map(x => passageRow(x, { onGo: s => go(s, { flash: x.e }), onRemove: () => { store.toggleStar(x.s, x.e); render(); } }))
-      : h('p', { class: 'empty' }, 'Nothing starred yet.'));
+      : h('p', { class: 'empty' }, 'Nothing starred.'));
   }
   render();
   return sheet;
