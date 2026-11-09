@@ -7,7 +7,7 @@ home: wally
 zmx: w.bible
 waiting_on: [Phone check of the tap fixes and the BLB link]
 blocked: []
-next: [Check the tap fixes and the BLB link on the phone, Retire the old fossil checkout]
+next: [Check the tap fixes, the BLB link and the chapter hairline on the phone]
 ---
 ## Upkeep
 - **Public repo:** anyone can read this file. Nothing private -- no names, emails, secrets or personal details.
@@ -31,7 +31,7 @@ next: [Check the tap fixes and the BLB link on the phone, Retire the old fossil 
 ### Repo
 - [x] Bring the fossil checkout's newer work into git (branch merge-py)
 - [x] Review and merge merge-py into main
-- [ ] Retire the old fossil checkout
+- [x] Retire the old fossil checkout
 
 ## Open questions
 
@@ -53,15 +53,13 @@ next: [Check the tap fixes and the BLB link on the phone, Retire the old fossil 
 - `rake cf:texts` after `rake text` changes a licensed version.
 ### on the phone (deployed 2026-11-08, v28)
 - the chapter hairline's end segments look right on shared pages; a marked verse number opens its references; taps between lines select; the BLB button opens the BLB app.
-### fossil retirement (merge-py is merged)
-- Retire the old fossil checkout (it was the working copy until 2026-10-31) and its ignore-glob lines.
-- Claude's project memory for this directory still says to work in the fossil checkout; update it.
 
 ## Ideas
 
 ## Inbox
 
 ## Done
+- 2026-11-08 Old fossil checkout retired: removed from the py repo with its globs, the directory moved to the trash.
 - 2026-11-08 Reader taps: the click after a tap no longer lands on the references sheet; taps between lines select their verse; the BLB link is an intent for the Android app. Deployed.
 - 2026-11-08 Chapter pages hairline sizes shared end pages by share; deployed (v28).
 - 2026-11-08 merge-py fast-forwarded into main, deployed (v27, verify OK) and pushed.
